@@ -1,0 +1,40 @@
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+  <h1>Companies</h1>
+  <% if policy(Company.new).create? %>
+    <%= link_to "Add Company", new_company_path,
+        style: "background: #2c3e50; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+  <% end %>
+</div>
+
+<% if @companies.any? %>
+  <% @companies.each do |company| %>
+    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+          <h2 style="margin: 0 0 0.25rem;">
+            <%= link_to company.name, company_path(company), style: "text-decoration: none; color: #2c3e50;" %>
+          </h2>
+          <p style="color: #666; margin: 0.25rem 0;">
+            <%= company.industry %> &bull; <%= link_to company.website, company.website, target: "_blank" if company.website.present? %>
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <% if policy(company).update? %>
+            <%= link_to "Edit", edit_company_path(company), style: "color: #f39c12;" %>
+          <% end %>
+          <% if policy(company).destroy? %>
+            <%= button_to "Delete", company_path(company), method: :delete,
+                style: "background: none; border: none; color: #e74c3c; cursor: pointer; padding: 0;",
+                data: { turbo_confirm: "Are you sure?" } %>
+          <% end %>
+        </div>
+      </div>
+      <p style="margin: 0.75rem 0 0; color: #444;"><%= truncate(company.description, length: 150) %></p>
+      <p style="margin: 0.5rem 0 0; color: #666; font-size: 0.9rem;">
+        <%= company.jobs.count %> job(s) &bull; <%= company.users.count %> user(s)
+      </p>
+    </div>
+  <% end %>
+<% else %>
+  <p style="color: #666;">No companies found.</p>
+<% end %>

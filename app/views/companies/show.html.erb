@@ -1,0 +1,54 @@
+<div style="max-width: 800px;">
+  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+    <div>
+      <h1 style="margin: 0 0 0.25rem;"><%= @company.name %></h1>
+      <p style="color: #666; margin: 0;">
+        <%= @company.industry %>
+        <% if @company.website.present? %>
+          &bull; <%= link_to @company.website, @company.website, target: "_blank", style: "color: #3498db;" %>
+        <% end %>
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <% if policy(@company).update? %>
+        <%= link_to "Edit", edit_company_path(@company), style: "color: #f39c12;" %>
+      <% end %>
+      <% if policy(@company).destroy? %>
+        <%= button_to "Delete", company_path(@company), method: :delete,
+            style: "background: #e74c3c; color: white; border: none; padding: 0.4rem 0.8rem; cursor: pointer; border-radius: 4px;",
+            data: { turbo_confirm: "Are you sure?" } %>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="background: #f8f9fa; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><%= @company.description %></p>
+  </div>
+
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+  <h3 style="margin: 0;">Open Jobs (<%= @company.jobs.open_jobs.count %>)</h3>
+  <% if policy(Job.new).create? %>
+    <%= link_to "Post a Job", new_company_job_path(@company),
+        style: "background: #2c3e50; color: white; padding: 0.4rem 1rem; border-radius: 4px; text-decoration: none; font-size: 0.9rem;" %>
+  <% end %>
+</div>
+  <% if @company.jobs.any? %>
+    <% @company.jobs.recent.each do |job| %>
+      <div style="border: 1px solid #ddd; border-radius: 6px; padding: 1rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <%= link_to job.title, job_path(job), style: "font-weight: bold; color: #2c3e50; text-decoration: none;" %>
+          <span style="color: #666; font-size: 0.9rem; margin-left: 0.5rem;"><%= job.location %></span>
+        </div>
+        <span style="background: <%= job.open? ? '#d4edda' : '#f8d7da' %>;
+                     color: <%= job.open? ? '#155724' : '#721c24' %>;
+                     padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem;">
+          <%= job.status.humanize %>
+        </span>
+      </div>
+    <% end %>
+  <% else %>
+    <p style="color: #666;">No jobs posted yet.</p>
+  <% end %>
+
+  <%= link_to "Back to Companies", companies_path, style: "display: inline-block; margin-top: 1rem; color: #666;" %>
+</div>

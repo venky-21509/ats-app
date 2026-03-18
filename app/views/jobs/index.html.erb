@@ -1,0 +1,43 @@
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+  <h1>Job Postings</h1>
+  <% if policy(Job.new).create? %>
+    <%= link_to "Post a Job", companies_path, 
+        style: "background: #2c3e50; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;" %>
+  <% end %>
+</div>
+
+<% if @jobs.any? %>
+  <% @jobs.each do |job| %>
+    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+          <h2 style="margin: 0 0 0.25rem;">
+            <%= link_to job.title, job_path(job), style: "text-decoration: none; color: #2c3e50;" %>
+          </h2>
+          <p style="color: #666; margin: 0.25rem 0;">
+            <%= job.company.name %> &bull; <%= job.location %> &bull; <%= job.job_type&.humanize %>
+          </p>
+        </div>
+        <span style="background: <%= job.open? ? '#d4edda' : '#f8d7da' %>; 
+                     color: <%= job.open? ? '#155724' : '#721c24' %>; 
+                     padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem;">
+          <%= job.status.humanize %>
+        </span>
+      </div>
+      <p style="margin: 0.75rem 0 0; color: #444;"><%= truncate(job.description, length: 150) %></p>
+      <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+        <%= link_to "View", job_path(job), style: "color: #3498db;" %>
+        <% if policy(job).update? %>
+          <%= link_to "Edit", edit_job_path(job), style: "color: #f39c12;" %>
+        <% end %>
+        <% if policy(job).destroy? %>
+          <%= button_to "Delete", job_path(job), method: :delete, 
+              style: "background: none; border: none; color: #e74c3c; cursor: pointer; padding: 0;",
+              data: { turbo_confirm: "Are you sure?" } %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <p style="color: #666;">No job postings found.</p>
+<% end %>

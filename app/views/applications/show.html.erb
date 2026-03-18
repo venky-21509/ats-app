@@ -1,0 +1,117 @@
+<div style="max-width: 800px;">
+  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+    <div>
+      <h1 style="margin: 0 0 0.25rem;">Application — <%= @application.user.full_name %></h1>
+      <p style="color: #666; margin: 0;">
+        For: <%= link_to @application.job.title, job_path(@application.job) %>
+      </p>
+    </div>
+
+    <% if policy(@application).update? %>
+      <%= form_with url: update_status_application_path(@application), method: :patch, style: "display: flex; gap: 0.5rem; align-items: center;" do |f| %>
+        <%= f.select :status,
+            Application.statuses.keys.map { |s| [s.humanize, s] },
+            { selected: @application.status },
+            style: "padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px;",
+            onchange: "this.form.submit()" %>
+      <% end %>
+    <% else %>
+      <span style="background: #e8f4fd; color: #1a5276; padding: 0.25rem 0.75rem; border-radius: 20px;">
+        <%= @application.status.humanize %>
+      </span>
+    <% end %>
+  </div>
+
+  <div style="background: #f8f9fa; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <h3 style="margin-top: 0;">Cover Letter</h3>
+    <p><%= simple_format(@application.cover_letter) %></p>
+    <% if @application.resume.attached? %>
+  <p>
+    <strong>Resume:</strong>
+    <%= link_to "Download Resume", rails_blob_path(@application.resume, disposition: "attachment"),
+        target: "_blank", style: "color: #3498db;" %>
+  </p>
+<% end %>
+    <p style="color: #666; font-size: 0.9rem;">Applied: <%= @application.applied_at&.strftime("%B %d, %Y") %></p>
+  </div>
+
+ <% if policy(Note.new).create? %>
+  <div style="background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+    <h3 style="margin-top: 0;">Add Internal Note</h3>
+    <%= form_with url: application_notes_path(@application), scope: :note do |f| %>
+      <%= f.text_area :body, placeholder: "Write a note...", rows: 3,
+          style: "width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 0.5rem;" %>
+      <%= f.submit "Add Note",
+          style: "background: #2c3e50; color: white; padding: 0.4rem 1rem; border: none; border-radius: 4px; cursor: pointer;" %>
+    <% end %>
+  </div>
+<% end %>
+
+  <% if @application.notes.any? && policy(Note.new).index? %>
+    <div style="margin-bottom: 1.5rem;">
+      <h3>Internal Notes</h3>
+      <% @application.notes.recent.each do |note| %>
+        <div style="background: #fffde7; border-left: 4px solid #f39c12; padding: 0.75rem 1rem; margin-bottom: 0.75rem; border-radius: 0 4px 4px 0;">
+          <p style="margin: 0 0 0.5rem;"><%= note.body %></p>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <small style="color: #666;"><%= note.author.full_name %> &bull; <%= note.created_at.strftime("%b %d, %Y %H:%M") %></small>
+            <% if policy(note).destroy? %>
+              <%= button_to "Delete", note_path(note),
+                  params: { application_id: @application.id },
+                  method: :delete,
+                  style: "background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 0.8rem;",
+                  data: { turbo_confirm: "Delete this note?" } %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if policy(Reminder.new).create? %>
+  <div style="background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+    <h3 style="margin-top: 0;">Set Reminder</h3>
+    <%= form_with url: application_reminders_path(@application), scope: :reminder do |f| %>
+      <div style="display: flex; gap: 0.75rem; align-items: end;">
+        <div style="flex: 1;">
+          <%= f.label :message, "Message", style: "display: block; font-size: 0.9rem; margin-bottom: 0.25rem;" %>
+          <%= f.text_field :message, placeholder: "Reminder message...",
+              style: "width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" %>
+        </div>
+        <div>
+          <%= f.label :remind_at, "Date & Time", style: "display: block; font-size: 0.9rem; margin-bottom: 0.25rem;" %>
+          <%= f.datetime_local_field :remind_at,
+              style: "padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" %>
+        </div>
+        <%= f.submit "Set",
+            style: "background: #8e44ad; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;" %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+  <% if @application.reminders.any? && policy(Reminder.new).index? %>
+    <div style="margin-bottom: 1.5rem;">
+      <h3>Reminders</h3>
+      <% @application.reminders.order(:remind_at).each do |reminder| %>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 0.5rem; background: <%= reminder.sent? ? '#f8f9fa' : '#fff' %>;">
+          <div>
+            <span><%= reminder.message %></span>
+            <small style="color: #666; margin-left: 0.5rem;"><%= reminder.remind_at.strftime("%b %d, %Y %H:%M") %></small>
+            <% if reminder.sent? %>
+              <span style="color: #27ae60; font-size: 0.8rem; margin-left: 0.5rem;">Sent</span>
+            <% end %>
+          </div>
+          <% if policy(reminder).destroy? %>
+            <%= button_to "Delete", reminder_path(reminder),
+                method: :delete,
+                style: "background: none; border: none; color: #e74c3c; cursor: pointer;",
+                data: { turbo_confirm: "Delete reminder?" } %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= link_to "Back", job_applications_path(@application.job), style: "color: #666;" %>
+</div>

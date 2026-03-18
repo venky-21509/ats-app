@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Ats App" %></title>
+    
+
+    <title> ATS App </title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -23,6 +25,40 @@
   </head>
 
   <body>
+      <nav style="padding: 1rem; background: #1a1a2e; color: white; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <%= link_to "ATS App", root_path, style: "color: white; font-weight: bold; text-decoration: none; font-size: 1.2rem;" %>
+      </div>
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <% if user_signed_in? %>
+          <% if current_user.admin? || current_user.staff? %>
+            <%= link_to "Companies", companies_path, style: "color: white;" %>
+          <% end %>
+          <%= link_to "Jobs", root_path, style: "color: white;" %>
+          <% if current_user.candidate? %>
+            <%= link_to "My Applications", application_path(current_user.applications.last), style: "color: white;" if current_user.applications.any? %>
+          <% end %>
+          <span style="color: #ccc;">(<%= current_user.full_name %> — <%= current_user.role %>)</span>
+          <%= button_to "Sign out", destroy_user_session_path, method: :delete, style: "background: #e74c3c; color: white; border: none; padding: 0.4rem 0.8rem; cursor: pointer; border-radius: 4px;" %>
+        <% else %>
+          <%= link_to "Sign in", new_user_session_path, style: "color: white;" %>
+          <%= link_to "Sign up", new_user_registration_path, style: "color: white;" %>
+        <% end %>
+      </div>
+    </nav>
+
+    <main style="max-width: 1100px; margin: 2rem auto; padding: 0 1rem;">
+      <% if notice %>
+        <div style="background: #d4edda; color: #155724; padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1rem;">
+          <%= notice %>
+        </div>
+      <% end %>
+      <% if alert %>
+        <div style="background: #f8d7da; color: #721c24; padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1rem;">
+          <%= alert %>
+        </div>
+      <% end %>
     <%= yield %>
+    </main>
   </body>
 </html>

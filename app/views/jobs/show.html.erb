@@ -1,0 +1,54 @@
+<div style="max-width: 800px;">
+  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+    <div>
+      <h1 style="margin: 0 0 0.25rem;"><%= @job.title %></h1>
+      <p style="color: #666; margin: 0;">
+        <%= @job.company.name %> &bull; <%= @job.location %> &bull; <%= @job.job_type&.humanize %>
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <span style="background: <%= @job.open? ? '#d4edda' : '#f8d7da' %>; 
+                   color: <%= @job.open? ? '#155724' : '#721c24' %>; 
+                   padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem;">
+        <%= @job.status.humanize %>
+      </span>
+      <% if policy(@job).update? %>
+        <%= link_to "Edit", edit_job_path(@job), style: "color: #f39c12;" %>
+      <% end %>
+      <% if policy(@job).destroy? %>
+        <%= button_to "Delete", job_path(@job), method: :delete,
+            style: "background: #e74c3c; color: white; border: none; padding: 0.4rem 0.8rem; cursor: pointer; border-radius: 4px;",
+            data: { turbo_confirm: "Are you sure?" } %>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="background: #f8f9fa; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <h3>Job Description</h3>
+    <p><%= simple_format(@job.description) %></p>
+    <% if @job.closes_at %>
+      <p style="color: #666;">Closes on: <%= @job.closes_at.strftime("%B %d, %Y") %></p>
+    <% end %>
+  </div>
+
+  <% if current_user.candidate? && @job.open? %>
+    <% existing = current_user.applications.find_by(job: @job) %>
+    <% if existing %>
+      <p style="color: #666;">You have already applied. 
+        <%= link_to "View your application", application_path(existing) %>
+      </p>
+    <% else %>
+      <%= link_to "Apply Now", new_job_application_path(@job),
+          style: "background: #27ae60; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none; display: inline-block;" %>
+    <% end %>
+  <% end %>
+
+  <% if policy(@job).update? %>
+    <div style="margin-top: 2rem;">
+      <h3>Applications (<%= @job.applications.count %>)</h3>
+      <%= link_to "View All Applications", job_applications_path(@job), style: "color: #3498db;" %>
+    </div>
+  <% end %>
+
+  <%= link_to "Back to Jobs", root_path, style: "display: inline-block; margin-top: 1rem; color: #666;" %>
+</div>

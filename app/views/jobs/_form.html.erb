@@ -1,0 +1,47 @@
+<%= form_with model: @job.new_record? ? [@job.company, @job] : @job, style: "max-width: 600px;" do |f| %>
+  <% if @job.errors.any? %>
+    <div style="background: #f8d7da; color: #721c24; padding: 0.75rem; border-radius: 4px; margin-bottom: 1rem;">
+      <% @job.errors.full_messages.each do |msg| %>
+        <p style="margin: 0;"><%= msg %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div style="margin-bottom: 1rem;">
+    <%= f.label :title, style: "display: block; font-weight: bold; margin-bottom: 0.25rem;" %>
+    <%= f.text_field :title, style: "width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" %>
+  </div>
+
+  <div style="margin-bottom: 1rem;">
+    <%= f.label :description, style: "display: block; font-weight: bold; margin-bottom: 0.25rem;" %>
+    <%= f.text_area :description, rows: 6, style: "width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" %>
+  </div>
+
+  <div style="margin-bottom: 1rem;">
+    <%= f.label :location, style: "display: block; font-weight: bold; margin-bottom: 0.25rem;" %>
+    <%= f.text_field :location, style: "width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" %>
+  </div>
+
+  <div style="margin-bottom: 1rem;">
+    <%= f.label :job_type, style: "display: block; font-weight: bold; margin-bottom: 0.25rem;" %>
+    <%= f.select :job_type, Job.job_types.keys.map { |t| [t.humanize, t] },
+        { include_blank: "Select type" },
+        style: "width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" %>
+  </div>
+
+  <div style="margin-bottom: 1rem;">
+    <%= f.label :status, style: "display: block; font-weight: bold; margin-bottom: 0.25rem;" %>
+    <%= f.select :status, Job.statuses.keys.map { |s| [s.humanize, s] },
+        { include_blank: "Select status" },
+        style: "width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" %>
+  </div>
+
+  <div style="margin-bottom: 1.5rem;">
+    <%= f.label :closes_at, style: "display: block; font-weight: bold; margin-bottom: 0.25rem;" %>
+    <%= f.date_field :closes_at, style: "width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" %>
+  </div>
+
+  <%= f.submit @job.new_record? ? "Post Job" : "Update Job",
+      style: "background: #2c3e50; color: white; padding: 0.6rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem;" %>
+  <%= link_to "Cancel", root_path, style: "margin-left: 1rem; color: #666;" %>
+<% end %>
