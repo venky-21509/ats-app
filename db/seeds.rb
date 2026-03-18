@@ -127,7 +127,6 @@ app1 = Application.create!(
   user: candidate1,
   status: :interview,
   cover_letter: "I am very excited about this opportunity at Acme Corp. I have 4 years of Rails experience and have built several production applications.",
-  resume_url: "https://example.com/alice-resume.pdf",
   applied_at: 5.days.ago
 )
 
@@ -136,7 +135,7 @@ app2 = Application.create!(
   user: candidate2,
   status: :screening,
   cover_letter: "Rails has been my primary framework for the past 3 years. I am confident I can contribute greatly to your team.",
-  resume_url: "https://example.com/bob-resume.pdf",
+  
   applied_at: 3.days.ago
 )
 
@@ -145,7 +144,7 @@ app3 = Application.create!(
   user: candidate3,
   status: :applied,
   cover_letter: "I am a passionate frontend developer with strong React skills and a great eye for UI design.",
-  resume_url: "https://example.com/carol-resume.pdf",
+
   applied_at: 2.days.ago
 )
 
@@ -154,7 +153,7 @@ app4 = Application.create!(
   user: candidate1,
   status: :offer,
   cover_letter: "I have extensive DevOps experience with AWS and have led infrastructure migrations for two startups.",
-  resume_url: "https://example.com/alice-resume.pdf",
+  
   applied_at: 10.days.ago
 )
 
